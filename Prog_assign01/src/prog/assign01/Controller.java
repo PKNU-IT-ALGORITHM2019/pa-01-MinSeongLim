@@ -36,24 +36,37 @@ public class Controller {
 	private void findWord(String word) {
 		int first = 0;
 		int end = list.size()-1;
-		int index = bi_search(word,first,end);		
-		print(index);
+		int index = bi_search(convert_no_spe_ch(word),first,end);		
+		print(word, index);
 	}
 
-	private void print(int index) {
+	private String convert_no_spe_ch(String word)
+	{
+		String text = "";
+		for(int i = 0; i<word.length(); i++)
+			if(word.charAt(i)==' ' || (word.charAt(i)>='A' && word.charAt(i)<='z'))
+				text += word.charAt(i);
+		return text;
+	}
+	
+	private void print(String word, int index) {
 		if(index >= 0)
 		{
 			String w = list.get(index).spelling;
 			int start;
 			int end;
-			for(start = index-1; start>=0 && w.compareTo(list.get(start).spelling)==0 ; start--) {}
+			for(start = index-1; start>=0 && w.compareTo(convert_no_spe_ch(list.get(start).spelling))==0 ; start--) {}
 			start++;
-			for(end = index+1; end<list.size() && w.compareTo(list.get(end).spelling)==0 ; end++) {}
+			for(end = index+1; end<list.size() && w.compareTo(convert_no_spe_ch(list.get(start).spelling))==0 ; end++) {}
 			end--;
-			System.out.println("Find " + (end-start+1) +" items.");
-			System.out.println(list.get(index).spelling);
-			for(int i = start; i<=end; i++)			
-				System.out.println(list.get(i).parts_of_speech + " " + list.get(i).mean);			
+			ArrayList<Word> tmp = new ArrayList<Word>();
+			for(int i = start; i<=end; i++)
+				if(list.get(i).spelling.compareToIgnoreCase(word)==0)
+					tmp.add(new Word(list.get(i).spelling,list.get(i).parts_of_speech,list.get(i).mean));
+			System.out.println("Find " + tmp.size() +" items.");
+			System.out.println(word);
+			for(int i = 0; i<tmp.size(); i++)			
+				System.out.println(tmp.get(i).parts_of_speech + " " + tmp.get(i).mean);			
 		}
 		else
 		{
@@ -68,7 +81,7 @@ public class Controller {
 		if(first>end)
 			return -1*end;
 		int mid = (first+end)/2;
-		String w = list.get(mid).spelling;
+		String w = convert_no_spe_ch(list.get(mid).spelling);
 		if(w.compareToIgnoreCase(word)==0)
 			return mid;
 		else if(w.compareToIgnoreCase(word)>0)
@@ -86,7 +99,6 @@ public class Controller {
 		} catch (FileNotFoundException e) {
 			System.out.println("File dose not exist");	
 		}
-		Collections.sort(list);
 	}
 
 	private void split(String line) {

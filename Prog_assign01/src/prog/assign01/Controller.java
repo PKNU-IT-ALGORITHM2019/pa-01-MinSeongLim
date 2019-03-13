@@ -3,6 +3,7 @@ package prog.assign01;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Scanner;
 
 public class Controller {
@@ -35,14 +36,14 @@ public class Controller {
 	private void findWord(String word) {
 		int first = 0;
 		int end = list.size()-1;
-		int index = bi_search(get_ch(word),first,end);		
+		int index = bi_search(word,first,end);		
 		print(index);
 	}
 
 	private void print(int index) {
 		if(index >= 0)
 		{
-			String w = get_ch(list.get(index).spelling);
+			String w = list.get(index).spelling;
 			int start;
 			int end;
 			for(start = index-1; start>=0 && w.compareTo(list.get(start).spelling)==0 ; start--) {}
@@ -52,8 +53,7 @@ public class Controller {
 			System.out.println("Find " + (end-start+1) +" items.");
 			System.out.println(list.get(index).spelling);
 			for(int i = start; i<=end; i++)			
-				System.out.println(list.get(i).parts_of_speech + " " + list.get(i).mean);
-			
+				System.out.println(list.get(i).parts_of_speech + " " + list.get(i).mean);			
 		}
 		else
 		{
@@ -68,7 +68,7 @@ public class Controller {
 		if(first>end)
 			return -1*end;
 		int mid = (first+end)/2;
-		String w = get_ch(list.get(mid).spelling);
+		String w = list.get(mid).spelling;
 		if(w.compareToIgnoreCase(word)==0)
 			return mid;
 		else if(w.compareToIgnoreCase(word)>0)
@@ -77,15 +77,6 @@ public class Controller {
 			return bi_search(word, mid +1, end);
 	}
 	
-	private String get_ch(String word)
-	{
-		String text = "";
-		for(int i = 0; i <word.length(); i++)
-		
-			if(word.charAt(i)==' ' || (word.charAt(i)>='A' && word.charAt(i)<='z') || (word.charAt(i)>='0' && word.charAt(i)<='9'))
-				text+=word.charAt(i);		
-		return text;
-	}
 	private void readFile(String file) {
 		try {			
 			Scanner sc = new Scanner(new File(file));			
@@ -95,6 +86,7 @@ public class Controller {
 		} catch (FileNotFoundException e) {
 			System.out.println("File dose not exist");	
 		}
+		Collections.sort(list);
 	}
 
 	private void split(String line) {

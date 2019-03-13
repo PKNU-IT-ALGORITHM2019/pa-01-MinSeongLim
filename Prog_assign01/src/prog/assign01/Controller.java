@@ -7,6 +7,7 @@ import java.util.Scanner;
 
 public class Controller {
 	public ArrayList<Word> list = new ArrayList<Word>();
+	
 	public void exe()
 	{
 		Scanner sc = new Scanner(System.in);
@@ -28,87 +29,83 @@ public class Controller {
 			else
 				System.out.println("Unkown Command");
 		}
-		sc.close();
+		sc.close();		
 	}
 
 	private void findWord(String word) {
 		int first = 0;
 		int end = list.size()-1;
-		int index = bi_search(word,first,end);
-		
+		int index = bi_search(word,first,end);		
+		print(index);
+	}
+
+	private void print(int index) {
 		if(index >= 0)
 		{
-			String w = list.get(index).spelling;
-			int v1= index;
-			int v2 = index;
-			while(v1>=1 && list.get(v1-1).spelling.compareTo(w)==0)
-				v1--;
-			while(v2<list.size()-1 && list.get(v2+1).spelling.compareTo(w)==0)
-				v2++;
-			for(int i = v1; i<=v2; i++)			
-				System.out.println(w + " " + list.get(i).parts_of_speech + " " + list.get(i).mean);
-			
+			String word = list.get(index).spelling;
+			int start;
+			int end;
+			for(start = index-1; start>=0 && list.get(start).spelling.compareTo(word)==0 ; start--) {}
+			start++;
+			for(end = index+1; end<list.size() && list.get(end).spelling.compareTo(word)==0 ; end++) {}
+			end--;
+			System.out.println(list.get(index).spelling);
+			for(int i = start; i<=end; i++)			
+				System.out.println(list.get(i).parts_of_speech + " " + list.get(i).mean);
 		}
 		else
 		{
+			index *= -1;
 			System.out.println("Not found.");
-			System.out.println(list.get(-1*index -1).spelling + " " + list.get(-1*index -1).parts_of_speech);
-			System.out.println("- - -");
-			System.out.println(list.get(-1*index).spelling + " " + list.get(-1*index).parts_of_speech);
-		}
-			
-		
+			System.out.println((index!=list.size()-1)?(list.get(index).spelling + " " + list.get(index).parts_of_speech + "\n- - -\n" + list.get(index+1).spelling + " " + list.get(index).parts_of_speech):
+				(list.get(index).spelling +"\n- - -\n"));
+		}		
 	}
 
 	private int bi_search(String word, int first, int end) {
 		if(first>end)
-			return -1*first;
+			return -1*end;
 		int mid = (first+end)/2;
-		
-		if(list.get(mid).spelling.compareToIgnoreCase(word)==0)
+		String w = list.get(mid).spelling;
+		if(w.compareToIgnoreCase(word)==0)
 			return mid;
-		else if(list.get(mid).spelling.compareToIgnoreCase(word)>0)
+		else if(w.compareToIgnoreCase(word)>0)
 			return bi_search(word, first, mid -1);			
 		else
 			return bi_search(word, mid +1, end);
 	}
 
 	private void readFile(String file) {
-		try {
-			
+		try {			
 			Scanner sc = new Scanner(new File(file));			
 			while(sc.hasNext())
-			{						
-				String spelling = sc.next();				
-				String next = sc.next();				
-				while(next.charAt(0)!='(')
-				{					
-					spelling = spelling + " " +next;					
-					if(sc.hasNext())
-						next = sc.next();
-				}
-				String pos = next;
-				if(pos.charAt(pos.length()-1)!=')')
-				{
-					next = sc.next();
-					while(next.charAt(next.length()-1)!=')')
-					{					
-						pos = pos + " " +next;					
-						if(sc.hasNext())
-							next = sc.next();
-					}
-					if(next.charAt(next.length()-1)==')')
-						pos = pos + " " +next;		
-					
-				}
-				String mean = sc.next() + sc.nextLine();
-				list.add(new Word(spelling,pos,mean));					
-			}
-			sc.close();			
-			
+				split(sc.nextLine());			
+			sc.close();				
 		} catch (FileNotFoundException e) {
-			System.out.println("File dose not exist");			
+			System.out.println("File dose not exist");	
 		}
 	}
 
+	private void split(String line) {
+		if(line.compareTo("")==0)
+			return;
+		String spelling = "";
+		String pos = "";
+		String mean = "";
+		int i = 0;
+		for( ; line.charAt(i) != '(' ; i++)
+			spelling+=line.charAt(i);
+		spelling = spelling.substring(0, spelling.length()-1);
+		for( ; line.charAt(i) != ')' ; i++)
+			pos+=line.charAt(i);		
+		pos+=')';
+		if(i+2<line.length())
+			mean = line.substring(i+2);
+		list_add(spelling, pos, mean);
+	}
+
+	private void list_add(String spelling, String pos, String mean) {		
+		Word w = new Word(spelling,pos,mean);
+		list.add(w);						
+	}
 }

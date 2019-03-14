@@ -52,7 +52,7 @@ public class Controller {
 	private void print(String word, int index) {
 		if(index >= 0)
 		{
-			String w = list.get(index).spelling;
+			String w = convert_no_spe_ch(list.get(index).spelling);
 			int start;
 			int end;
 			for(start = index-1; start>=0 && w.compareTo(convert_no_spe_ch(list.get(start).spelling))==0 ; start--) {}
